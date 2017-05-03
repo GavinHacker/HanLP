@@ -40,5 +40,6 @@ public class DemoSuggester
         System.out.println(suggester.suggest("危机公关", 1));   // 字符
         System.out.println(suggester.suggest("mayun", 1));      // 拼音
         System.out.println(suggester.suggest("徐家汇", 1));      // 拼音
+        System.out.println(suggester.suggest("老百姓", 1));
     }
 }

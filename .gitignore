@@ -29,6 +29,8 @@ hs_err_pid*
 # 大模型
 data/model/*
 !data/model/README.txt
+#gavinchange:dictionary
+/data
 # 系统文件
 **/.DS_Store
 .java-version
