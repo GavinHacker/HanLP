@@ -12,10 +12,18 @@
 package com.hankcs.demo;
 
 import com.hankcs.hanlp.HanLP;
+import com.hankcs.hanlp.HanLP.Config;
+import com.hankcs.hanlp.corpus.tag.Nature;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
+import com.hankcs.hanlp.dictionary.stopword.CoreStopWordDictionary;
+import com.hankcs.hanlp.seg.common.Term;
 import com.hankcs.hanlp.summary.TextRankKeyword;
+import com.rexen.rlp.HanLPMock;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 关键词提取
@@ -57,14 +65,32 @@ public class DemoKeyword
                 "另外数据挖掘、互联网搜索算法也成为当今的热门方向。\n" +
                 "算法工程师逐渐往人工智能方向发展。";
         
+        String text$1 = "从事中成药、化学药制剂、抗生素、生物制品（限诊断药品）、体外诊断试剂、321医用电子仪器设备、240/340临床检验分析仪器、345体外循环及血液处理设备、346植入材料和人工器官、364医用卫生材料及敷料、266/366医用高分子材料及制品、377介入器材批发、零售（医疗器械经营企业许可证有效期至2015年4月22日、药品经营许可证有效期至2015年4月22日，企业应在许可证有效期内开展经营活动）；以及化妆品、预包装食品（调味品、饮料）、日用品、保健食品的批发和进出口业务（食品流通许可证有效期至2013年7月11日）；医药产品、医药产品注册的咨询服务及医药领域软件开发#（依法须经批准的项目，经相关部门批准后方可开展经营活动）";
+        
+        
         CustomDictionary.add("算可");
+
         
-        List<String> keywordList = HanLP.extractKeyword(content, 5);
+        //List<String> keywordList = HanLP.extractKeyword(content, 10);
         
-        System.out.println(keywordList);
+        //System.out.println(keywordList);
         
-        List<String> keywordList1 = HanLP.extractPhrase(content, 10);
+        //List<String> keywordList1 = HanLP.extractPhrase(content, 10);
         
-        System.out.println(keywordList1);
+        //System.out.println(keywordList1);
+        //TextRankKeyword.
+        CoreStopWordDictionary.contains("程序员");
+        System.out.println(HanLP.extractKeyword(content, 10));
+        
+        System.out.println(HanLP.extractPhrase(text$1, 10));
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 						split and rank 						 						 					 	//
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        System.out.println(HanLPMock.$core(text$1));
+        
+    }
+    
+    public static void getByFilter(){
+    	
     }
 }
