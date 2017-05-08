@@ -18,7 +18,7 @@ import com.hankcs.hanlp.dictionary.CustomDictionary;
 import com.hankcs.hanlp.dictionary.stopword.CoreStopWordDictionary;
 import com.hankcs.hanlp.seg.common.Term;
 import com.hankcs.hanlp.summary.TextRankKeyword;
-import com.rexen.rlp.HanLPMock;
+import com.rexen.rlp.RLP;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +86,7 @@ public class DemoKeyword
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 						split and rank 						 						 					 	//
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        System.out.println(HanLPMock.$core(text$1));
+        System.out.println(RLP.extractKeyword2(text$1, 5));
         
     }
     
