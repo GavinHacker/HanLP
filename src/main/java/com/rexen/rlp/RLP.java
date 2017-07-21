@@ -31,6 +31,8 @@ public class RLP {
 	
 	public static final class Config {
 		
+		public static boolean PrintFilterAndReduce = false;
+		
 		public static String StopPhrasePath = "";
 		
 		public static String SpiltPunctuation[] = new String[] { ",", "，", "、" };
@@ -84,6 +86,8 @@ public class RLP {
 				
 				String t = p.getProperty("SpiltPunctuation","");
 				SpiltPunctuation = t.split("\\|\\$");
+				String pt = p.getProperty("PrintFilterAndReduce", "false");
+				PrintFilterAndReduce = Boolean.parseBoolean(pt);
 				/////////////////////////////////////////////////////////////////////////////////
 			} catch (Exception e) {
 				logger.log(Level.WARNING, "Exception is", e);
@@ -148,7 +152,11 @@ public class RLP {
 		return content;
 	}
 	
-	public static String filterReduce(String seg) {
+	public static String filterReduce(String seg){
+		return filterReduce(seg, true);
+	}
+	
+	public static String filterReduce(String seg, boolean withStatusLog) {
 		boolean subFinish = false;
 		String temp = seg;
 		
@@ -159,7 +167,7 @@ public class RLP {
 		final String REGEX_EX_FUNCTION_LESS_THAN = "func_less_than_len__"; 
 		
 		for (String s : Config.FilterAndReduceFlage.keySet()) {
-			
+			len = 0;
 			if ((Config.FilterAndReduceFlage.get(s) & Config.Regex) == Config.Regex) {
 				rS = s;
 				if(s.contains(REGEX_EX_FUNCTION_LESS_THAN)){
@@ -181,21 +189,27 @@ public class RLP {
 					}
 					if (!subFinish && (Config.FilterAndReduceFlage.get(s) & Config.FilterFlag) == Config.FilterFlag) {
 						seg = "";
-						logger.log(Level.INFO, String.format("Regex Filter one seg %s --- %s ==> %s", temp, s, seg));
-						System.out.println(String.format("Regex Filter one seg %s --- %s ==> %s", temp, s, seg));
+						if(withStatusLog){
+							logger.log(Level.INFO, String.format("Regex Filter one seg %s --- %s ==> %s", temp, s, seg));
+							System.out.println(String.format("Regex Filter one seg %s --- %s ==> %s", temp, s, seg));
+						}
 						subFinish = true;
 					}
 					
 					if ((Config.FilterAndReduceFlage.get(s) & Config.ReduceFlag) == Config.ReduceFlag) {
 						seg = seg.replace(group, "");
-						logger.log(Level.INFO, String.format("Regex Reduce one seg %s --- %s ==> %s", temp, s, seg));
-						System.out.println(String.format("Regex Reduce one seg %s --- %s ==> %s", temp, s, seg));
+						if(withStatusLog){
+							logger.log(Level.INFO, String.format("Regex Reduce one seg %s --- %s ==> %s", temp, s, seg));
+							System.out.println(String.format("Regex Reduce one seg %s --- %s ==> %s", temp, s, seg));
+						}
 					}
 					
 					if (!subFinish && (Config.FilterAndReduceFlage.get(s) & Config.ClauseFilterFlag) == Config.ClauseFilterFlag) {
 						seg = "";
-						logger.log(Level.INFO, String.format("Regex Clause filter one seg %s --- %s ==> %s", temp, s, seg));
-						System.out.println(String.format("Regex Clause filter one seg %s --- %s ==> %s", temp, s, seg));
+						if(withStatusLog){
+							logger.log(Level.INFO, String.format("Regex Clause filter one seg %s --- %s ==> %s", temp, s, seg));
+							System.out.println(String.format("Regex Clause filter one seg %s --- %s ==> %s", temp, s, seg));
+						}
 						subFinish = true;
 					}
 				}
@@ -205,8 +219,10 @@ public class RLP {
 		if (Config.FilterAndReduceFlage.containsKey(seg)) {
 			if ((Config.FilterAndReduceFlage.get(seg) & Config.FilterFlag) == Config.FilterFlag) {
 				seg = "";
-				logger.log(Level.INFO, String.format("Filter one seg %s --- %s ==> %s", temp, temp, seg));
-				System.out.println(String.format("Filter one seg %s --- %s ==> %s", temp, temp, seg));
+				if(withStatusLog){
+					logger.log(Level.INFO, String.format("Filter one seg %s --- %s ==> %s", temp, temp, seg));
+					System.out.println(String.format("Filter one seg %s --- %s ==> %s", temp, temp, seg));
+				}
 				subFinish = true;
 			}
 		}
@@ -217,15 +233,18 @@ public class RLP {
 
 					if ((Config.FilterAndReduceFlage.get(s) & Config.ReduceFlag) == Config.ReduceFlag) {
 						seg = seg.replace(s, "");
-						logger.log(Level.INFO, String.format("Reduce one seg %s --- %s ==> %s", temp, s, seg));
-						System.out.println(String.format("Reduce one seg %s --- %s ==> %s", temp, s, seg));
+						if (withStatusLog) {
+							logger.log(Level.INFO, String.format("Reduce one seg %s --- %s ==> %s", temp, s, seg));
+							System.out.println(String.format("Reduce one seg %s --- %s ==> %s", temp, s, seg));
+						}
 					}
 
-					if (!subFinish && (Config.FilterAndReduceFlage.get(s)
-							& Config.ClauseFilterFlag) == Config.ClauseFilterFlag) {
+					if (!subFinish && (Config.FilterAndReduceFlage.get(s) & Config.ClauseFilterFlag) == Config.ClauseFilterFlag) {
 						seg = "";
-						logger.log(Level.INFO, String.format("Clause filter one seg %s --- %s ==> %s", temp, s, seg));
-						System.out.println(String.format("Clause filter one seg %s --- %s ==> %s", temp, s, seg));
+						if(withStatusLog){
+							logger.log(Level.INFO, String.format("Clause filter one seg %s --- %s ==> %s", temp, s, seg));
+							System.out.println(String.format("Clause filter one seg %s --- %s ==> %s", temp, s, seg));
+						}
 						subFinish = true;
 					}
 				}
@@ -271,7 +290,7 @@ public class RLP {
         String phraseArray[] = text$1.split(Config.MARK_FOR_SPLIT);
         List<Term> list = new ArrayList<Term>();
         for(int c = 0; c < phraseArray.length; ++ c){
-        	String seg = filterReduce(phraseArray[c].trim());
+        	String seg = filterReduce(phraseArray[c].trim(), Config.PrintFilterAndReduce);
 			if (!seg.isEmpty()) {
 				Term t = new Term(seg, Nature.n);
 				list.add(t);
@@ -291,6 +310,11 @@ public class RLP {
 	
 	public static void main(String args[]){
 		
+		String ct = "许可、生产(米玩除外)、片剂(除大药房)、玩机(片剂除了税)、生产浓缩丸(生产不含)、除外楼、生产超级浓缩丸(不含有)";
+		ct = "ddddd（除外）";
+		List<String> keywordList1 = RLP.extractKeyword2(ct, 10);
+		System.out.println(keywordList1);
+		if(true) return;
 		System.out.println("=========test run success=========");
 		
 		String txt_1 = "产业投资;产业投资;产业投资;产业投资;google,google,google,中医药产业投资；中药材种植及初加工；鹿与林蛙养殖；中医药技术研发；医药制造；旅游开发；养老服务。（依法须经批准的项目，经相关部门批准后方可开展经营活动）"
