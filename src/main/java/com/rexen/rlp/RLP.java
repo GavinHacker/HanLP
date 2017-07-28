@@ -1,7 +1,5 @@
 package com.rexen.rlp;
 
-import static com.hankcs.hanlp.utility.Predefine.logger;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,13 +8,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Filter;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,8 +33,20 @@ import com.hankcs.hanlp.corpus.tag.Nature;
 import com.hankcs.hanlp.seg.common.Term;
 import com.hankcs.hanlp.summary.TextRankKeyword;
 import com.hankcs.hanlp.utility.Predefine;
+import com.hankcs.hanlp.utility.TimeStampUtil;
+
+import static com.hankcs.hanlp.utility.Predefine.logger;
+
+class RLogHandler extends Formatter {
+	@Override
+	public String format(LogRecord record) {
+		return record.getLevel() + " *** " + record.getMessage() + "\n";
+	}
+}
 
 public class RLP {
+	
+	//private static Logger logger = Logger.getLogger("RLP");
 	
 	public static final class Config {
 		
@@ -57,7 +76,7 @@ public class RLP {
 		
 		public static final int Regex = 8;
 		
-		public static HashMap<String, Integer> FilterAndReduceFlage = new HashMap<String, Integer>();
+		public static HashMap<String, Integer> FilterAndReduceFlage = new LinkedHashMap<String, Integer>();
 
 		static {
 			// 自动读取配置
@@ -88,6 +107,27 @@ public class RLP {
 				SpiltPunctuation = t.split("\\|\\$");
 				String pt = p.getProperty("PrintFilterAndReduce", "false");
 				PrintFilterAndReduce = Boolean.parseBoolean(pt);
+				/////////////////////////////////////////////////////////////////////////////////
+				/*ConsoleHandler consoleHandler = new ConsoleHandler();
+				consoleHandler.setLevel(Level.FINE);
+				logger.addHandler(consoleHandler);
+				FileHandler fileHandler = new FileHandler("/Users/gavin/workspace_machinelearn/HanLP/HanLP/rlp.log");
+				fileHandler.setLevel(Level.FINE);
+				fileHandler.setFormatter(new RLogHander());
+				logger.addHandler(fileHandler);*/
+				//System.setProperty("java.util.logging.config.file", "logging.properties");
+				//logger = Logger.getLogger("RLP");
+				
+				logger = Logger.getLogger("RLP");
+				FileHandler fileHandler = new FileHandler(TimeStampUtil.dateToString(new Date(), "yyyyMMddHHmmss")+".log");
+				fileHandler.setLevel(Level.FINE);
+				fileHandler.setFormatter(new RLogHandler());
+				logger.addHandler(fileHandler);
+				logger.getParent().removeHandler(logger.getParent().getHandlers()[0]);
+				
+				for(Handler h : logger.getHandlers()){
+					logger.info(h.getClass().getName());
+				}
 				/////////////////////////////////////////////////////////////////////////////////
 			} catch (Exception e) {
 				logger.log(Level.WARNING, "Exception is", e);
@@ -191,7 +231,7 @@ public class RLP {
 						seg = "";
 						if(withStatusLog){
 							logger.log(Level.INFO, String.format("Regex Filter one seg %s --- %s ==> %s", temp, s, seg));
-							System.out.println(String.format("Regex Filter one seg %s --- %s ==> %s", temp, s, seg));
+							//System.out.println(String.format("Regex Filter one seg %s --- %s ==> %s", temp, s, seg));
 						}
 						subFinish = true;
 					}
@@ -200,7 +240,7 @@ public class RLP {
 						seg = seg.replace(group, "");
 						if(withStatusLog){
 							logger.log(Level.INFO, String.format("Regex Reduce one seg %s --- %s ==> %s", temp, s, seg));
-							System.out.println(String.format("Regex Reduce one seg %s --- %s ==> %s", temp, s, seg));
+							//System.out.println(String.format("Regex Reduce one seg %s --- %s ==> %s", temp, s, seg));
 						}
 					}
 					
@@ -208,7 +248,7 @@ public class RLP {
 						seg = "";
 						if(withStatusLog){
 							logger.log(Level.INFO, String.format("Regex Clause filter one seg %s --- %s ==> %s", temp, s, seg));
-							System.out.println(String.format("Regex Clause filter one seg %s --- %s ==> %s", temp, s, seg));
+							//System.out.println(String.format("Regex Clause filter one seg %s --- %s ==> %s", temp, s, seg));
 						}
 						subFinish = true;
 					}
@@ -221,7 +261,7 @@ public class RLP {
 				seg = "";
 				if(withStatusLog){
 					logger.log(Level.INFO, String.format("Filter one seg %s --- %s ==> %s", temp, temp, seg));
-					System.out.println(String.format("Filter one seg %s --- %s ==> %s", temp, temp, seg));
+					//System.out.println(String.format("Filter one seg %s --- %s ==> %s", temp, temp, seg));
 				}
 				subFinish = true;
 			}
@@ -235,7 +275,7 @@ public class RLP {
 						seg = seg.replace(s, "");
 						if (withStatusLog) {
 							logger.log(Level.INFO, String.format("Reduce one seg %s --- %s ==> %s", temp, s, seg));
-							System.out.println(String.format("Reduce one seg %s --- %s ==> %s", temp, s, seg));
+							//System.out.println(String.format("Reduce one seg %s --- %s ==> %s", temp, s, seg));
 						}
 					}
 
@@ -243,7 +283,7 @@ public class RLP {
 						seg = "";
 						if(withStatusLog){
 							logger.log(Level.INFO, String.format("Clause filter one seg %s --- %s ==> %s", temp, s, seg));
-							System.out.println(String.format("Clause filter one seg %s --- %s ==> %s", temp, s, seg));
+							//System.out.println(String.format("Clause filter one seg %s --- %s ==> %s", temp, s, seg));
 						}
 						subFinish = true;
 					}
@@ -254,7 +294,7 @@ public class RLP {
 	}
 	
 	public static HashMap<String, Integer> readFileByLines(String fileName) {
-		HashMap<String, Integer> result = new HashMap<String, Integer>();
+		HashMap<String, Integer> result = new LinkedHashMap<String, Integer>();
 		//File file = new File(fileName);
 		BufferedReader reader = null;
 		try {
@@ -265,7 +305,8 @@ public class RLP {
 			while ((str = reader.readLine()) != null) {
 				String[] tempArray = str.split(":");
 				result.put(tempArray[0], Integer.valueOf(tempArray[1]));
-				System.out.println("phrase index " + index + ": " + str);
+				logger.info("phrase index " + index + ": " + str);
+				//System.out.println("phrase index " + index + ": " + str);
 				index++;
 			}
 			reader.close();
@@ -299,7 +340,7 @@ public class RLP {
         //filter(list);
         TextRankKeyword textRankKeyword = new TextRankKeyword();
         Set<Map.Entry<String, Float>> entrySet = getRankBySize(textRankKeyword.getRank(list), size).entrySet();
-        System.out.println(entrySet);
+        //System.out.println(entrySet);
         List<String> result = new ArrayList<String>(entrySet.size());
         for (Map.Entry<String, Float> entry : entrySet)
         {
